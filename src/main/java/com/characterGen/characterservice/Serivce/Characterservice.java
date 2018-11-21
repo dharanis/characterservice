@@ -3,16 +3,14 @@ package com.characterGen.characterservice.Serivce;
 import com.characterGen.characterservice.Entity.CharacterGen;
 import com.characterGen.characterservice.Entity.CharacterObj;
 import com.characterGen.characterservice.Repository.CharacterGenRepo;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
@@ -47,9 +45,14 @@ public class Characterservice {
         this.char_gen_repo = char_gen_repo;
     }
 
-    public CharacterGen saveCharacter( String char_name, String class_name) throws JsonProcessingException {
+    public CharacterGen saveCharacter( String char_name, String class_name)  {
+        CharacterGen char_req =new CharacterGen();
+        try{
+            char_req = generateCharacter(char_name, class_name);
+        }catch (Exception e){
 
-        CharacterGen char_req = generateCharacter(char_name, class_name);
+        }
+
         return char_gen_repo.save(char_req);
     }
 
@@ -57,52 +60,43 @@ public class Characterservice {
 
         int[] ran = randomNum().toArray();
         CharacterGen char_gen = new CharacterGen();
+        char_gen.setChar_name(char_name);
+        char_gen.setChar_class(class_name);
         CharacterObj char_obj_json = new CharacterObj();
         if (class_name.equals("Warrior")) {
-            char_gen.setChar_name(char_name);
-            char_gen.setChar_class("Warrior");
             char_gen.setStrength(ran[0]);
-            char_gen.setIntelligence(ran[4]);
+            char_gen.setIntelligence(ran[5]);
             char_gen.setCharacter(ran[1]);
             char_gen.setDexterity(ran[2]);
             char_gen.setWisdom(ran[3]);
 
         } else if (class_name.equals("Archer")) {
-            char_gen.setChar_name(char_name);
-            char_gen.setChar_class(class_name);
             char_gen.setDexterity(ran[0]);
-            char_gen.setCharacter(ran[4]);
+            char_gen.setCharacter(ran[5]);
             char_gen.setIntelligence(ran[1]);
             char_gen.setStrength(ran[2]);
             char_gen.setWisdom(ran[3]);
 
         } else if (class_name.equals("Wizard")) {
-
-            char_gen.setChar_name(char_name);
-            char_gen.setChar_class(class_name);
             char_gen.setIntelligence(ran[0]);
-            char_gen.setStrength(ran[4]);
+            char_gen.setStrength(ran[5]);
             char_gen.setCharacter(ran[1]);
             char_gen.setDexterity(ran[2]);
             char_gen.setWisdom(ran[3]);
         } else if (class_name.equals("Rogue")) {
-
-            char_gen.setChar_name(char_name);
-            char_gen.setChar_class(class_name);
             char_gen.setCharacter(ran[0]);
-            char_gen.setStrength(ran[4]);
+            char_gen.setStrength(ran[5]);
             char_gen.setIntelligence(ran[1]);
             char_gen.setDexterity(ran[2]);
             char_gen.setWisdom(ran[3]);
         }
         else
         {
-            char_gen.setChar_name(HttpStatus.NOT_FOUND.toString());
-            char_gen.setChar_class("Not Found");
+            throw new CharacterClassNotFoundEx();
         }
-        char_gen.setCon(2);
+        char_gen.setCon(ran[4]);
         char_gen.setHitPoints(char_gen.getCon() * 2);
-        char_gen.setInventory(4);
+        char_gen.setInventory(new int[1]);
         char_gen.setLocation(6);
         String json = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(char_gen);
         char_obj_json.setChar_json(json);
@@ -112,8 +106,13 @@ public class Characterservice {
 
     public IntStream randomNum() {
         Random ran = new Random();
-        return ran.ints(5, 8, 18).sorted();
+        return ran.ints(6, 8, 18).sorted();
 
     }
+
+}
+
+@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "The character generation with the given name fails")
+class CharacterClassNotFoundEx extends RuntimeException{
 
 }

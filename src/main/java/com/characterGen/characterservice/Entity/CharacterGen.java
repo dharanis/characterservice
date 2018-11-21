@@ -3,14 +3,29 @@ package com.characterGen.characterservice.Entity;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Entity
 public class CharacterGen {
+
+    public CharacterGen(){}
+
+    public CharacterGen(String char_name, String char_class, int intelligence, int wisdom, int character, int strength, int dexterity, int con, int location, int[] inventory, int hitPoints) {
+        this.char_name = char_name;
+        this.char_class = char_class;
+        this.intelligence = intelligence;
+        this.wisdom = wisdom;
+        this.character = character;
+        this.strength = strength;
+        this.dexterity = dexterity;
+        this.con = con;
+        this.location = location;
+        this.inventory = inventory;
+        this.hitPoints = hitPoints;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +39,7 @@ public class CharacterGen {
     int dexterity;
     int con;
     int location;
-    int inventory;
+    int[] inventory;
     int hitPoints;
 
     public Long getId() {
@@ -107,11 +122,11 @@ public class CharacterGen {
         this.location = location;
     }
 
-    public int getInventory() {
+    public int[] getInventory() {
         return inventory;
     }
 
-    public void setInventory(int inventory) {
+    public void setInventory(int[] inventory) {
         this.inventory = inventory;
     }
 

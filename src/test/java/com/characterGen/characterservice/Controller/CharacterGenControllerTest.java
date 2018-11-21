@@ -18,9 +18,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -45,16 +43,30 @@ public class CharacterGenControllerTest {
 
     @Test
     public void createCharacterTest() throws Exception {
-        CharacterObj characterObj = new CharacterObj();
-        when(char_service.saveCharacter("test","Warrior")).thenReturn(characterObj);
+        CharacterGen characterObj = new CharacterGen();
+        when(char_service.saveCharacter(anyString(),anyString())).thenReturn(characterObj);
         mockMvc.perform(MockMvcRequestBuilders
-        .post("/api/create/test/Warrior")
+        .post("/api/create/{char_name}/{class_name}","test","Warrior")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(new ObjectMapper().writeValueAsBytes(characterObj))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andReturn();
-        verify(char_service,times(1)).saveCharacter("test","Warrior");
+        verify(char_service,times(1)).saveCharacter(anyString(),anyString());
+        verifyNoMoreInteractions(char_service);
+    }
+
+    @Test
+    public void createNonCharTest() throws Exception {
+        when(char_service.saveCharacter(anyString(),anyString())).thenThrow(new CharacterGenFails());
+        mockMvc.perform(MockMvcRequestBuilders
+                .post("/api/create/{char_name}/{class_name}","test","test")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andDo(print())
+                .andReturn();
+        verify(char_service,times(1)).saveCharacter(anyString(),anyString());
+        verifyNoMoreInteractions(char_service);
     }
 }

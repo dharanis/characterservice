@@ -2,9 +2,7 @@ package com.characterGen.characterservice.Controller;
 
 
 import com.characterGen.characterservice.Entity.CharacterGen;
-import com.characterGen.characterservice.Entity.CharacterObj;
 import com.characterGen.characterservice.Serivce.Characterservice;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -46,10 +44,15 @@ public class CharacterGenController {
    }
 
    @PostMapping("/create/{char_name}/{class_name}")
-   @ResponseStatus(HttpStatus.OK)
-    public CharacterGen createCharacter(@PathVariable String char_name, @PathVariable String class_name) throws JsonProcessingException {
+   //@ResponseStatus(HttpStatus.OK)
+    public CharacterGen createCharacter(@PathVariable String char_name, @PathVariable String class_name) {
        return char_service.saveCharacter(char_name,class_name);
    }
 
+
+}
+
+@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Character generation fails for given name")
+class CharacterGenFails extends RuntimeException{
 
 }
