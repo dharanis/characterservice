@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 /*
 Scenario: Happy path
 Given A running client with an internet connection.
@@ -44,12 +46,30 @@ public class CharacterGenController {
    }
 
    @PostMapping("/create/{char_name}/{class_name}")
-   //@ResponseStatus(HttpStatus.OK)
+   @ResponseStatus(HttpStatus.OK)
     public CharacterGen createCharacter(@PathVariable String char_name, @PathVariable String class_name) {
        return char_service.saveCharacter(char_name,class_name);
    }
 
+   @GetMapping ("/update/{char_id}/{location}")
+   @ResponseStatus(HttpStatus.OK)
+    public CharacterGen updateCharacter(@PathVariable Long char_id,@PathVariable int location){
+        return char_service.updateCharacter(char_id,location);
+   }
 
+   @GetMapping("/get/{char_id}")
+    public CharacterGen getCharById(@PathVariable Long char_id){
+        return char_service.getCharById(char_id);
+   }
+    @GetMapping("/get/location/{char_id}")
+    public Integer getLocation(@PathVariable Long char_id){
+        return char_service.getLocation(char_id);
+    }
+
+    @GetMapping("/get/hitpoints/{char_id}")
+    public Integer getHitPoints(@PathVariable Long char_id){
+        return char_service.getHitPoints(char_id);
+    }
 }
 
 @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Character generation fails for given name")

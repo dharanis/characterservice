@@ -18,6 +18,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.Optional;
+
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -69,4 +71,70 @@ public class CharacterGenControllerTest {
         verify(char_service,times(1)).saveCharacter(anyString(),anyString());
         verifyNoMoreInteractions(char_service);
     }
+
+    @Test
+    public void updateCharTest() throws Exception {
+        CharacterGen characterObj = new CharacterGen();
+        when(char_service.updateCharacter(anyLong(),anyInt())).thenReturn(characterObj);
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/api/update/{char_id}/{location}",1,4)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn();
+        verify(char_service,times(1)).updateCharacter(anyLong(),anyInt());
+        verifyNoMoreInteractions(char_service);
+    }
+
+
+    @Test
+    public void getCharByIdTest() throws Exception {
+        CharacterGen characterGen = new CharacterGen();
+        when(char_service.getCharById(anyLong())).thenReturn(characterGen);
+
+        mockMvc.perform(MockMvcRequestBuilders
+        .get("/api/get/{char_id}",6)
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn();
+
+
+        verify(char_service,times(1)).getCharById(anyLong());
+    }
+
+    @Test
+    public void getCharLocationByIdTest() throws Exception {
+        when(char_service.getLocation(anyLong())).thenReturn(anyInt());
+
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/api/get/location/{char_id}",6)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn();
+
+
+        verify(char_service,times(1)).getLocation(anyLong());
+    }
+
+    @Test
+    public void getHitPointsTest() throws Exception {
+        when(char_service.getHitPoints(anyLong())).thenReturn(anyInt());
+
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/api/get/hitpoints/{char_id}",6)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn();
+
+
+        verify(char_service,times(1)).getHitPoints(anyLong());
+    }
+
 }

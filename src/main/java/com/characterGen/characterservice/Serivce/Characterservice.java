@@ -5,6 +5,7 @@ import com.characterGen.characterservice.Entity.CharacterObj;
 import com.characterGen.characterservice.Repository.CharacterGenRepo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jdk.nashorn.internal.runtime.options.Option;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.stream.IntStream;
 
@@ -97,7 +99,7 @@ public class Characterservice {
         char_gen.setCon(ran[4]);
         char_gen.setHitPoints(char_gen.getCon() * 2);
         char_gen.setInventory(new int[1]);
-        char_gen.setLocation(6);
+        char_gen.setLocation(4);
         String json = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(char_gen);
         char_obj_json.setChar_json(json);
 
@@ -110,9 +112,37 @@ public class Characterservice {
 
     }
 
+    public CharacterGen updateCharacter(Long char_id,int location) {
+        Optional<CharacterGen> characterGen = char_gen_repo.findById(char_id);
+        if(!characterGen.isPresent()){
+            throw new CharacterClassNotFoundForID();
+        }
+        CharacterGen cha = characterGen.get();
+        cha.setLocation(location);
+        return char_gen_repo.save(cha);
+    }
+
+    public CharacterGen getCharById(Long char_id) {
+        return char_gen_repo.findById(char_id).get();
+    }
+
+    public Integer getLocation(Long char_id) {
+        CharacterGen char_req = char_gen_repo.findById(char_id).get();
+        return char_req.getLocation();
+    }
+
+    public Integer getHitPoints(Long char_id) {
+        CharacterGen char_req = char_gen_repo.findById(char_id).get();
+        return char_req.getHitPoints();
+    }
 }
 
 @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "The character generation with the given name fails")
 class CharacterClassNotFoundEx extends RuntimeException{
+
+}
+
+@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "The character with the given Id does not exist")
+class CharacterClassNotFoundForID extends RuntimeException{
 
 }
